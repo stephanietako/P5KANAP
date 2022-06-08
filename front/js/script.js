@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
     //--------------------------------------------------------//
     async function main() {
 
-        let products = await GetProduts();
+        let products = await GetProducts();
 
         for (let product of products) {
             displayProducts(product);
@@ -15,8 +15,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     //-------------------Fonction d'intérrogation de notre api avec product-------------------//
     //-----------------------------------------------------------------------------------------//
-    function GetProduts() {
+    //je récupère le resultat de la requête
+    function GetProducts() {
         return fetch("http://localhost:3000/api/products")
+            //then va récuperer le résultat de la requête
             .then(function (response) {
                 return response.json();
             })
@@ -39,6 +41,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         <img src="${product.imageUrl}" alt="${product.altTxt}">
                         <h3 class="productName">${product.name}</h3>
                         <p class="productDescription">${product.description}</p>
+                        <p class="productPrice">${product.price}€</p>
                     </article>
                 </a>
             `
