@@ -1,6 +1,4 @@
 document.addEventListener("DOMContentLoaded", function (event) {
-    document.getElementById("addToCart").addEventListener("click", myFunction);
-    //le boutton est déjà là dans le html déjà généré donc pourquoi ne pas le mettre au début
 
     //-------------------fonction principale-------------------//
     //--------------------------------------------------------//
@@ -91,5 +89,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
             let qt = localStorage.getItem("quantity");
             console.log(qt);
         }
+        document.getElementById("addToCart").addEventListener("click", myFunction);
     }
+
 });
