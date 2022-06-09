@@ -76,20 +76,22 @@ document.addEventListener("DOMContentLoaded", function (event) {
         });
 
 
-        function myFunction() {
+        function addToCart() {
             let quantity = document.getElementById("quantity").value;
             console.log(product.name);
             console.log(product.price);
             console.log(colors.value);
-            console.log(quantity);
+            //console.log(quantity);
             //et maintenant je dois enregistrer les infos dans un local storage
 
+            //avec setItem j'accède à l'objet "storage" et lui ajoute une entrée, je stocke mes données
             localStorage.setItem("quantity", quantity);
             //aller dans application sur devTools
-            let qt = localStorage.getItem("quantity");
-            console.log(qt);
+            //je récupère mes données
+            let quantityLocalStorage = localStorage.getItem("quantity");
+            console.log(quantityLocalStorage);
         }
-        document.getElementById("addToCart").addEventListener("click", myFunction);
+        document.getElementById("addToCart").addEventListener("click", addToCart);
     }
 
 });
