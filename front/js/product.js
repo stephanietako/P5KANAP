@@ -64,6 +64,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
         const descriptProduct = document.getElementById("description");
         descriptProduct.innerHTML = product.description;
 
+        //pour pouvoir choisir la couleur
         const colors = document.getElementById("colors");
         console.log(colors);
 
@@ -75,23 +76,56 @@ document.addEventListener("DOMContentLoaded", function (event) {
             colors.appendChild(option);
         });
 
-
         function addToCart() {
             let quantity = document.getElementById("quantity").value;
-            console.log(product.name);
-            console.log(product.price);
-            console.log(colors.value);
-            //console.log(quantity);
-            //et maintenant je dois enregistrer les infos dans un local storage
+            //mettre le choix des produits de l'utilisateur dans une variable
+            let userChoiceProduct = {
+                //console.log(product.name);
+                //console.log(product.price);
+                //console.log(colors.value);
+                //console.log(quantity);
+                product_id: product._id,
+                productName: product.name,
+                productPrice: product.price,
+                productColor: colors.value,
+                productQuantity: quantity,
+            };
+            console.log(userChoiceProduct);
 
+            //**************************************************************************************  
+            //function addToCart() {
+            //let quantity = document.getElementById("quantity").value;
+            //console.log(product.name);
+            //console.log(product.price);
+            //console.log(colors.value);
+            //console.log(quantity);
+            //et maintenant je dois enregistrer les données dans un local storage
             //avec setItem j'accède à l'objet "storage" et lui ajoute une entrée, je stocke mes données
-            localStorage.setItem("quantity", quantity);
+            //localStorage.setItem("quantity", quantity);
             //aller dans application sur devTools
             //je récupère mes données
-            let quantityLocalStorage = localStorage.getItem("quantity");
-            console.log(quantityLocalStorage);
+            //let quantityLocalStorage = localStorage.getItem("quantity");
+            //console.log(quantityLocalStorage);
+            //**************************************************************************************  
+
+            //je déclacle ma variable dans laquelle je vais mettre les clés et valeurs
+            //la syntaxe JSON.parse() reforme l’objet à partir de la chaîne linéarisée. 
+            let test = JSON.parse(localStorage.getItem("laclé"));
+            //parse c'est pour convertir les données au format JSON
+            if (test) {
+                test.push(userChoiceProduct);
+                localStorage.setItem("laclé", JSON.stringify(test));
+                console.log(test);
+            } else {
+                //si y en a pas
+                test = [];
+                test.push(userChoiceProduct);
+                //Cette opération transforme l’objet en une chaîne de caractères
+                localStorage.setItem("laclé", JSON.stringify(test));
+                console.log(test);
+            }
         }
         document.getElementById("addToCart").addEventListener("click", addToCart);
     }
 
-});
+}); 
