@@ -4,13 +4,12 @@ document.addEventListener("DOMContentLoaded", function (event) {
     //--------------------------------------------------------//
     async function main() {
 
-        // On Récupére l'Url.
+        // recupération de l'Url.
         const url = new URL(window.location.href);
-        // productId = à Id récupérer en paramètre de notre Url
-        //url.serachParams c'est grâce à cette notion que ma page produit
-        //va pouvoir savoir lequel des différents produits de lAPI afficher.
+        // productId = à Id récupérer en paramètre de l'Url
+        // avec url.serachParams ma page produit va pouvoir savoir lequel des différents produits de lAPI afficher
+        // .get retourne la 1ère valeur associée au paramètre de recherche donnée
         let productId = url.searchParams.get("id");
-        //.get retourne la 1ère valeur associée au paramètre de recherche donnée
         console.log(productId);
 
         let product = await GetProductById(productId);
@@ -18,6 +17,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
         DisplayProduct(product);
 
+        BtnClick(product);
     }
 
     main();
@@ -41,9 +41,8 @@ document.addEventListener("DOMContentLoaded", function (event) {
     //-------------------Fonction d'affichage du produit-------------------//
     //---------------------------------------------------------------------//
     function DisplayProduct(product) {
-        console.log("COUCOU");
         console.log(product.name);
-        // Récupération des parents.
+        // récupération des parents.
         const title = document.getElementsByTagName("title")[0];
         //console.log(title);
         title.innerHTML = product.name;
@@ -52,7 +51,6 @@ document.addEventListener("DOMContentLoaded", function (event) {
         console.log(product.imageUrl);
         let image = document.createElement('img');
         image.src = product.imageUrl;
-        //parentImg.innerHTML = image;
         parentImg.appendChild(image);
         console.log(parentImg);
 
@@ -64,68 +62,97 @@ document.addEventListener("DOMContentLoaded", function (event) {
         const descriptProduct = document.getElementById("description");
         descriptProduct.innerHTML = product.description;
 
-        //pour pouvoir choisir la couleur
+        // pour pouvoir choisir la couleur
         const colors = document.getElementById("colors");
         console.log(colors);
 
         product.colors.forEach(color => {
-            console.log(color);
+            //console.log(color);
             let option = document.createElement('option');
             option.appendChild(document.createTextNode(color));
             option.value = color;
             colors.appendChild(option);
         });
 
-        function addToCart() {
-            let quantity = document.getElementById("quantity").value;
-            //mettre le choix des produits de l'utilisateur dans une variable
-            let userChoiceProduct = {
-                //console.log(product.name);
-                //console.log(product.price);
-                //console.log(colors.value);
-                //console.log(quantity);
-                product_id: product._id,
-                productName: product.name,
-                productPrice: product.price,
-                productColor: colors.value,
-                productQuantity: quantity,
-            };
-            console.log(userChoiceProduct);
-
-            //**************************************************************************************  
-            //function addToCart() {
-            //let quantity = document.getElementById("quantity").value;
-            //console.log(product.name);
-            //console.log(product.price);
-            //console.log(colors.value);
-            //console.log(quantity);
-            //et maintenant je dois enregistrer les données dans un local storage
-            //avec setItem j'accède à l'objet "storage" et lui ajoute une entrée, je stocke mes données
-            //localStorage.setItem("quantity", quantity);
-            //aller dans application sur devTools
-            //je récupère mes données
-            //let quantityLocalStorage = localStorage.getItem("quantity");
-            //console.log(quantityLocalStorage);
-            //**************************************************************************************  
-
-            //je déclacle ma variable dans laquelle je vais mettre les clés et valeurs
-            //la syntaxe JSON.parse() reforme l’objet à partir de la chaîne linéarisée. 
-            let test = JSON.parse(localStorage.getItem("laclé"));
-            //parse c'est pour convertir les données au format JSON
-            if (test) {
-                test.push(userChoiceProduct);
-                localStorage.setItem("laclé", JSON.stringify(test));
-                console.log(test);
-            } else {
-                //si y en a pas
-                test = [];
-                test.push(userChoiceProduct);
-                //Cette opération transforme l’objet en une chaîne de caractères
-                localStorage.setItem("laclé", JSON.stringify(test));
-                console.log(test);
-            }
-        }
-        document.getElementById("addToCart").addEventListener("click", addToCart);
     }
+
+    //-------------------Initialisation Class Produit-------------------//
+    //---------------------------------------------------------------------//
+    class ProductClass {
+        // utilisation du mot clé classe, j'initialise un objet avec la methode constructor 
+        constructor(id, name, color, quantity) {
+            this.id = id;
+            this.name = name;
+            this.color = color;
+            this.quantity = quantity;
+        }
+    }
+
+    //-------------------Fonction BoutonAddPanier et save LocalStorage-------------------//
+    //----------------------------------------------------------------------------------//
+    function BtnClick(product) {
+
+        // initialisation de mes variables
+        let colorChosen = "";
+        let quantityChosen = "";
+        let quantity = "";
+        let btnPanier = document.getElementById("addToCart");
+
+        // sélection des couleurs et de la quantité avec sont comportement au change(évenement change)
+        let selectColor = document.getElementById("colors");
+        selectColor.addEventListener("change", function (e) {
+            colorChosen = e.target.value;
+        });
+
+        let selectQuantity = document.getElementById("quantity");
+        selectQuantity.addEventListener("change", function (e) {
+            quantity = e.target.value;
+        });
+
+        // écoute au click sur le bouton Panier
+        btnPanier.addEventListener("click", function () {
+
+            let productLocalStorage = [];
+            let oldQuantity = 0;
+
+
+            // je fais une boucle for à la longueur du localStorage avec récuperation des informations du localstorage.
+            for (let i = 0; i < localStorage.length; i++) {
+                productLocalStorage[i] = JSON.parse(localStorage.getItem(localStorage.key(i)));
+                // je fais une condition si l'Id est la même dans le localStorage et dans notre nouveau produit
+                // et que si la Color de notre nouveau produit est strictement égale à celle qui est dans le localStorage 
+                if (product._id === productLocalStorage[i].id && productLocalStorage[i].color === colorChosen) {
+                    oldQuantity = productLocalStorage[i].quantity;
+                }
+            }
+
+            // La fonction parseInt() analyse une chaîne de caractère fournie en argument et renvoie un entier exprimé dans une base donnée
+            quantityChosen = parseInt(oldQuantity) + parseInt(quantity);
+
+            // on définit le produit choisi en créant une nouvelle instance de ProductClass,
+            // en programmation orientée classe, l'instanciation est la création d'un objet à partir d'une classe
+            // on injecte les nouvelles valeurs dans la Class.
+            let productChosen = new ProductClass(
+                product._id,
+                product.name,
+                colorChosen,
+                quantityChosen,
+            );
+
+            if (colorChosen != "" && quantityChosen >= 1 && quantityChosen <= 100) {
+                // .setItem on accède à l'objet localStorage et on lui ajoute une entrée 
+                localStorage.setItem(
+                    product.name + " " + colorChosen,
+                    JSON.stringify(productChosen)
+                );
+                console.log(productChosen)
+            } else {
+                alert("Veuillez renseigner une couleur et une quantité entre 1 et 100.");
+            }
+
+        })
+
+    }
+
 
 }); 
