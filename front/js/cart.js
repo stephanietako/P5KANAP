@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         let ApiArray = [];
 
-        // Stockage des informations de notre localstorage.
+        // on stocke les informations sur le localstorage.
         let localStorageArray = getLocalStorageProduct();
 
         for (let i = 0; i < localStorageArray.length; i++) {
@@ -100,7 +100,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         for (product of AllProducts) {
 
-            // On stock notre balise Html.
+            // on stocke la balise Html.
             const domCreation = document.getElementById("cart__items");
             // On push nos nouvels informations dans notre Html.
             domCreation.insertAdjacentHTML(
@@ -153,9 +153,9 @@ document.addEventListener("DOMContentLoaded", function () {
     //-------------------Fonction principal d'écoute-------------------//
     //----------------------------------------------------------------//
     function Listen(AllProducts) {
-        // Fonction si changement dans notre input quantity.
+        // fonction si changement dans notre input quantity.
         ecoutequantity(AllProducts);
-        // Fonction si on veux supprimer un éléments de la liste.
+        // fonction si on veux supprimer un éléments de la liste.
         //ecoutedeleteProduct(AllProducts);
     }
 
@@ -191,12 +191,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     DisplayTotalPrice(AllProducts);
 
                 } else {
-                    alert("Choisis une bonne quantité trou de balle.")
+                    alert("Veuillez choisir une quantité valable.")
                 }
             })
         })
 
     }
-
 
 })
