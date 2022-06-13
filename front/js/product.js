@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
         let colorChosen = "";
         let quantityChosen = "";
         let quantity = "";
-        let btnPanier = document.getElementById("addToCart");
+        let btnCart = document.getElementById("addToCart");
 
         // sélection des couleurs et de la quantité avec sont comportement au change(évenement change)
         let selectColor = document.getElementById("colors");
@@ -110,7 +110,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
         });
 
         // écoute au click sur le bouton Panier
-        btnPanier.addEventListener("click", function () {
+        btnCart.addEventListener("click", function () {
 
             let productLocalStorage = [];
             let oldQuantity = 0;
