@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         let ApiArray = [];
 
-        // on stocke les informations sur le localstorage.
+        // on stocke les informations sur le localstorage
         let localStorageArray = getLocalStorageProduct();
 
         for (let i = 0; i < localStorageArray.length; i++) {
@@ -21,7 +21,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         Listen(AllProducts);
 
-        ValidationForm()
+        ValidationForm();
+
+
     }
 
     main();
@@ -30,7 +32,7 @@ document.addEventListener("DOMContentLoaded", function () {
     //------------------------Récupération du LocalStorage -----------------------//
     //-------------------------------------------------------------------------//
     function getLocalStorageProduct() {
-        //déclaration de variable
+        // déclaration de variable
         let getLocalStorage = [];
         for (let i = 0; i < localStorage.length; i++) {
             getLocalStorage[i] = JSON.parse(localStorage.getItem(localStorage.key(i)));
@@ -104,7 +106,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // on stocke la balise Html.
             const domCreation = document.getElementById("cart__items");
-            // On push nos nouvels informations dans notre Html
+            // on push nos nouvels informations dans notre Html
             domCreation.insertAdjacentHTML(
                 "beforeend",
                 `<article class="cart__item" data-id="${product.id}" data-color="${product.color}">
@@ -251,7 +253,9 @@ document.addEventListener("DOMContentLoaded", function () {
         const cityRegex = /^[a-zA-Z',.\s-]{1,25}$/;
         let control = true;
 
-        // Si une des valeurs dans nos inputs de notre Form on affiche un méssage d'érreur.
+        // si une des valeurs dans nos inputs de notre Form est invalide on affiche un méssage d'érreur
+
+        // firstName
         if (!form.firstName.value.match(stringRegex)) {
             document.getElementById("firstNameErrorMsg").innerText = "Mauvais prénom";
             control = false;
@@ -260,8 +264,7 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("firstNameErrorMsg").innerText = "";
         }
 
-
-
+        // lastName
         if (!form.lastName.value.match(stringRegex)) {
             document.getElementById("lastNameErrorMsg").innerText = "Mauvais nom";
             control = false;
@@ -270,9 +273,7 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("lastNameErrorMsg").innerText = "";
         }
 
-
-
-        //
+        // email
         if (!form.email.value.match(emailRegex)) {
             document.getElementById("emailErrorMsg").innerText = "Mauvaise adresse";
             control = false;
@@ -281,27 +282,17 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("emailErrorMsg").innerText = "";
         }
 
-        //
+        // address
         if (!form.address.value.match(addressRegex)) {
             document.getElementById("addressErrorMsg").innerText = "Mauvaise adresse";
             control = false;
             // Sinon on affiche rien
         } else {
-            document.getElementById("addressRegex").innerText = "";
+            document.getElementById("addressErrorMsg").innerText = "";
 
         }
 
-
-        //
-        if (!form.email.value.match(emailRegex)) {
-            document.getElementById("emailErrorMsg").innerText = "Mauvaise adresse";
-            control = false;
-            // Sinon on affiche rien
-        } else {
-            document.getElementById("emailErrorMsg").innerText = "";
-        }
-
-        //
+        // city
         if (!form.city.value.match(cityRegex)) {
             document.getElementById("cityErrorMsg").innerText = "Mauvaise ville";
             control = false;
@@ -326,19 +317,61 @@ document.addEventListener("DOMContentLoaded", function () {
             let form = document.querySelector(".cart__order__form");
             event.preventDefault();
 
+            let firstNameValue = document.getElementById('firstName').value;
+            let lastNameValue = document.getElementById('lastName').value;
+            let addressValue = document.getElementById('address').value;
+            let cityValue = document.getElementById('city').value;
+            let emailValue = document.getElementById('email').value;
+
+            let contact = {
+                firstName: firstNameValue,
+                lastName: lastNameValue,
+                address: addressValue,
+                city: cityValue,
+                email: emailValue
+            }
+
+            // array localStorage
+            let dataOrder = getLocalStorageProduct();
+            //console.log(dataOrder);
+            let products = [];
+            dataOrder.forEach((product) => products.push(product.id));
+
+            // la methode POST c'est la méthode que le navigateur utilise pour demander au serveur une réponse 
+            // prenant en compte les données contenues dans le corps de la requête HTTP 
+
             if (localStorage.length !== 0) {
 
                 if (ValidationRegex(form)) {
+                    console.log("Le formulaire est BIEN remplis")
 
-                    console.log("tout à fonctionner")
-                    // il suffit de faire 2 array 1: avec les info du formulaire
-                    // 2: toutes les infos du localstorage
+                    // il suffit de faire 2 array 
+                    //  1: avec les info du formulaire
+                    //  2: toutes les infos du localstorage
                     // on regroupe les 2 dans un objet order
                     // on envois en ajax
 
+                    fetch('http://localhost:3000/api/products/order', {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        // un seul objet pour les 2 array
+                        body: JSON.stringify({ contact, products }),
+                    })
+                        .then((response) => response.json())
+                        .then((data) => {
+                            console.log("Fetch post effectué");
+                            console.log("Order ID:", data.orderId);
+                        })
+                        .catch((error) => {
+                            console.error(error);
+                        });
+
                 } else {
                     event.preventDefault();
-                    alert("Le formulaire est mal remplis");
+                    alert("Le formulaire est MAL remplis");
                 }
 
             } else {
