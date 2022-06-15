@@ -115,7 +115,6 @@ document.addEventListener("DOMContentLoaded", function (event) {
             let productLocalStorage = [];
             let oldQuantity = 0;
 
-
             // je fais une boucle for à la longueur du localStorage avec récuperation des informations du localstorage.
             for (let i = 0; i < localStorage.length; i++) {
                 productLocalStorage[i] = JSON.parse(localStorage.getItem(localStorage.key(i)));
@@ -124,6 +123,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
                 if (product._id === productLocalStorage[i].id && productLocalStorage[i].color === colorChosen) {
                     oldQuantity = productLocalStorage[i].quantity;
                 }
+                console.log(productLocalStorage);
             }
 
             // La fonction parseInt() analyse une chaîne de caractère fournie en argument et renvoie un entier exprimé dans une base donnée
@@ -155,4 +155,4 @@ document.addEventListener("DOMContentLoaded", function (event) {
     }
 
 
-}); 
+});

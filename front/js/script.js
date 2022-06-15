@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
     //--------------------------------------------------------//
     async function main() {
 
-        let products = await GetProducts();
+        let products = await getProducts();
 
         for (let product of products) {
             displayProducts(product);
@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
     //-------------------Fonction d'intérrogation de notre api avec product-------------------//
     //-----------------------------------------------------------------------------------------//
     //je récupère le resultat de la requête
-    function GetProducts() {
+    function getProducts() {
         return fetch("http://localhost:3000/api/products")
             //then va récuperer le résultat de la requête
             .then(function (response) {
@@ -31,9 +31,9 @@ document.addEventListener("DOMContentLoaded", function () {
     //---------------------------------------------------------------------//
     function displayProducts(product) {
 
-        let SectionItems = document.getElementById("items");
+        let sectionItems = document.getElementById("items");
 
-        SectionItems.insertAdjacentHTML(
+        sectionItems.insertAdjacentHTML(
             "beforeend",
             `
                 <a href="./product.html?id=${product._id}">
