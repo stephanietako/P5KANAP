@@ -28,7 +28,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     main();
 
-
     //------------------------Récupération du LocalStorage -----------------------//
     //-------------------------------------------------------------------------//
     function getLocalStorageProduct() {
@@ -97,13 +96,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     }
 
-
     //-------------------Fonction d'affichage des produits-------------------//
     //-----------------------------------------------------------------------//
     function DisplayProduct(AllProducts) {
 
         for (product of AllProducts) {
-
             // on stocke la balise Html.
             const domCreation = document.getElementById("cart__items");
             // on push nos nouvels informations dans notre Html
@@ -208,7 +205,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     //-------------------Fonction supprimer quantité-------------------//
     //-------------------------------------------------------------------//
-    //là je déclare ma fonction ecoutedeleteProduct
+    // là je déclare ma fonction ecoutedeleteProduct
 
     function ecoutedeleteProduct(AllProducts) {
 
@@ -231,7 +228,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 deletebtn.closest("article").remove();
                 let totalProductPrice = parseInt(productQuantity) * parseInt(productPrice.split(" ")[0]);
 
-                //doit update du coup le prix et la quantité totale
+                // doit update du coup le prix et la quantité totale
                 const DtotalQty = document.getElementById("totalQuantity");
                 //console.log(DtotalQty);
                 const DtotalPrice = document.getElementById("totalPrice");
@@ -337,6 +334,14 @@ document.addEventListener("DOMContentLoaded", function () {
             let products = [];
             dataOrder.forEach((product) => products.push(product.id));
 
+            // je stocke l'id dans le localStorage pour pour le récupérer pour la page confirmation
+            // et redirection de la page vers confirmation
+            function redirection() {
+                localStorage.setItem("idUserOrder", products);
+                location.replace("http://127.0.0.1:5500/front/html/confirmation.html")
+            }
+            redirection();
+
             // la methode POST c'est la méthode que le navigateur utilise pour demander au serveur une réponse 
             // prenant en compte les données contenues dans le corps de la requête HTTP 
 
@@ -362,7 +367,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     })
                         .then((response) => response.json())
                         .then((data) => {
-                            console.log("Fetch post effectué");
+                            console.log("Fetch post ok");
                             console.log("Order ID:", data.orderId);
                         })
                         .catch((error) => {
