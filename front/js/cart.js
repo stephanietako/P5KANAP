@@ -31,19 +31,21 @@ document.addEventListener("DOMContentLoaded", function () {
     //------------------------Récupération du LocalStorage -----------------------//
     //-------------------------------------------------------------------------//
     function getLocalStorageProduct() {
-        // déclaration de variable
+
+        //déclaration de variable
         let getLocalStorage = [];
         for (let i = 0; i < localStorage.length; i++) {
             getLocalStorage[i] = JSON.parse(localStorage.getItem(localStorage.key(i)));
 
         }
         return getLocalStorage;
+
     }
 
     //------------------------Récupération de l'API -----------------------//
     //--------------------------------------------------------------------//
     function GetApi(localStorageArray) {
-
+        console.log(localStorageArray)
         return fetch("http://localhost:3000/api/products/" + localStorageArray.id)
             .then(function (response) {
                 return response.json();
@@ -210,32 +212,32 @@ document.addEventListener("DOMContentLoaded", function () {
     function ecoutedeleteProduct(AllProducts) {
 
         const allDeleteBtn = document.querySelectorAll('.deleteItem');
-        allDeleteBtn.forEach(deletebtn => {
-            deletebtn.addEventListener("click", event => {
+        allDeleteBtn.forEach(input => {
+            input.addEventListener("click", function () {
 
-                //console.log(deletebtn.closest("h2").dataset.id);
-                //console.log((deletebtn.closest("article").children[1].children[0].children[0]).innerHTML);
-                let productName = (deletebtn.closest("article").children[1].children[0].children[0]).innerHTML;
-                let productQuantity = (deletebtn.closest("article").children[1].children[1]).children[0].children[1].value;
-                let productPrice = (deletebtn.closest("article").children[1].children[0].children[2]).innerHTML;
-                let productColor = deletebtn.closest("article").dataset.color;
-                //console.log(parseInt(productQuantity));
-                //console.log(parseInt(productPrice.split(" ")[0]));
-                //console.log(`${productName} ${productColor}`);
-                localStorage.removeItem(`${productName} ${productColor}`);
-                //let afterDelete = AllProducts.filter(product => product.id != deletebtn.closest("article").dataset.id)
-                //console.log(afterDelete);
-                deletebtn.closest("article").remove();
-                let totalProductPrice = parseInt(productQuantity) * parseInt(productPrice.split(" ")[0]);
+                const Name = input
+                    .closest("div.cart__item__content")
+                    .querySelector("div.cart__item__content__description > h2").innerText;
 
-                // doit update du coup le prix et la quantité totale
-                const DtotalQty = document.getElementById("totalQuantity");
-                //console.log(DtotalQty);
-                const DtotalPrice = document.getElementById("totalPrice");
-                DtotalQty.innerHTML = DtotalQty.innerHTML - productQuantity;
-                //console.log(DtotalPrice);
-                DtotalPrice.innerHTML = DtotalPrice.innerHTML - totalProductPrice;
-                //console.log(DtotalPrice);
+                const color = input
+                    .closest("div.cart__item__content")
+                    .querySelector("div.cart__item__content__description > p").innerText;
+
+                const productName = Name + " " + color;
+                console.log(productName)
+                let localstorageKey = JSON.parse(localStorage.getItem(productName));
+
+                localStorage.removeItem(productName);
+
+                input.closest("article.cart__item").remove();
+
+                const result = AllProducts.find(AllProduct => AllProduct.name === localstorageKey.name && AllProduct.color === localstorageKey.color);
+                console.log(result)
+                AllProducts = AllProducts.filter(product => product !== result);
+
+                ecoutequantity(AllProducts);
+
+                DisplayTotalPrice(AllProducts);
             })
         })
     }
@@ -272,7 +274,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // email
         if (!form.email.value.match(emailRegex)) {
-            document.getElementById("emailErrorMsg").innerText = "Mauvaise adresse";
+            document.getElementById("emailErrorMsg").innerText = "Mauvais email";
             control = false;
             // Sinon on affiche rien
         } else {
@@ -314,65 +316,49 @@ document.addEventListener("DOMContentLoaded", function () {
             let form = document.querySelector(".cart__order__form");
             event.preventDefault();
 
-            let firstNameValue = document.getElementById('firstName').value;
-            let lastNameValue = document.getElementById('lastName').value;
-            let addressValue = document.getElementById('address').value;
-            let cityValue = document.getElementById('city').value;
-            let emailValue = document.getElementById('email').value;
-
-            let contact = {
-                firstName: firstNameValue,
-                lastName: lastNameValue,
-                address: addressValue,
-                city: cityValue,
-                email: emailValue
-            }
-
-            // array localStorage
-            let dataOrder = getLocalStorageProduct();
-            //console.log(dataOrder);
-            let products = [];
-            dataOrder.forEach((product) => products.push(product.id));
-
-            // je stocke l'id dans le localStorage pour pour le récupérer pour la page confirmation
-            // et redirection de la page vers confirmation
-            function redirection() {
-                localStorage.setItem("idUserOrder", products);
-                location.replace("http://127.0.0.1:5500/front/html/confirmation.html")
-            }
-            redirection();
-
-            // la methode POST c'est la méthode que le navigateur utilise pour demander au serveur une réponse 
-            // prenant en compte les données contenues dans le corps de la requête HTTP 
-
             if (localStorage.length !== 0) {
 
                 if (ValidationRegex(form)) {
                     console.log("Le formulaire est BIEN remplis")
 
-                    // il suffit de faire 2 array 
-                    //  1: avec les info du formulaire
-                    //  2: toutes les infos du localstorage
-                    // on regroupe les 2 dans un objet order
-                    // on envois en ajax
+                    let contact = {
+                        firstName: form.firstName.value,
+                        lastName: form.lastName.value,
+                        address: form.address.value,
+                        city: form.city.value,
+                        email: form.email.value,
+                    }
 
-                    fetch('http://localhost:3000/api/products/order', {
-                        method: 'POST',
+                    // array localStorage
+                    let getLocalStorage = [];
+                    for (let i = 0; i < localStorage.length; i++) {
+                        getLocalStorage[i] = JSON.parse(localStorage.getItem(localStorage.key(i))).id;
+
+                    }
+
+                    const order = {
+                        contact: contact,
+                        products: getLocalStorage,
+                    };
+
+                    const options = {
+                        method: "POST",
+                        body: JSON.stringify(order),
                         headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
+                            Accept: "application/json",
+                            "Content-Type": "application/json",
                         },
-                        // un seul objet pour les 2 array
-                        body: JSON.stringify({ contact, products }),
-                    })
+                    };
+
+                    fetch("http://localhost:3000/api/products/order/", options)
                         .then((response) => response.json())
-                        .then((data) => {
-                            console.log("Fetch post ok");
-                            console.log("Order ID:", data.orderId);
+                        .then(function (data) {
+                            // c est transmettre un paramètre d URL
+                            window.location.href = "confirmation.html?id=" + data.orderId;
                         })
-                        .catch((error) => {
-                            console.error(error);
-                        });
+                        .catch(function (error) {
+                            alert("Error fetch order" + error.message);
+                        })
 
                 } else {
                     event.preventDefault();

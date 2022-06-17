@@ -3,31 +3,15 @@ document.addEventListener("DOMContentLoaded", function (event) {
     //-------------------fonction principale-------------------//
     //--------------------------------------------------------//
     async function main() {
-        idUserOrder();
+
+        const url = new URL(window.location.href);
+
+        document.getElementById("orderId").innerText = url.searchParams.get("id");
+
+        localStorage.clear();
 
     }
 
     main();
-
-    function idUserOrder() {
-        //const userConfirmation = document.getElementsByClassName("confirmation");
-        const orderIdNumb = document.getElementById("orderId");
-        orderIdNumb.innerText = localStorage.getItem('idUserOrder');
-
-        localStorage.clear()
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 });
