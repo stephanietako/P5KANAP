@@ -44,7 +44,6 @@ document.addEventListener("DOMContentLoaded", function (event) {
         console.log(product.name);
         // récupération des parents.
         const title = document.getElementsByTagName("title")[0];
-        //console.log(title);
         title.innerHTML = product.name;
 
         const parentImg = document.getElementsByClassName("item__img")[0];
@@ -56,7 +55,6 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
         const nameProduct = document.getElementById("title");
         nameProduct.innerHTML = product.name;
-        //console.log(product.name);
         const priceProduct = document.getElementById("price");
         priceProduct.innerHTML = product.price;
         const descriptProduct = document.getElementById("description");
@@ -67,7 +65,6 @@ document.addEventListener("DOMContentLoaded", function (event) {
         console.log(colors);
 
         product.colors.forEach(color => {
-            //console.log(color);
             let option = document.createElement('option');
             option.appendChild(document.createTextNode(color));
             option.value = color;
@@ -79,7 +76,6 @@ document.addEventListener("DOMContentLoaded", function (event) {
     //-------------------Initialisation Class Produit-------------------//
     //---------------------------------------------------------------------//
     class ProductClass {
-        // utilisation du mot clé classe, j'initialise un objet avec la methode constructor 
         constructor(id, name, color, quantity) {
             this.id = id;
             this.name = name;
@@ -118,8 +114,6 @@ document.addEventListener("DOMContentLoaded", function (event) {
             // je fais une boucle for à la longueur du localStorage avec récuperation des informations du localstorage.
             for (let i = 0; i < localStorage.length; i++) {
                 productLocalStorage[i] = JSON.parse(localStorage.getItem(localStorage.key(i)));
-                // je fais une condition si l'Id est la même dans le localStorage et dans notre nouveau produit
-                // et que si la Color de notre nouveau produit est strictement égale à celle qui est dans le localStorage 
                 if (product._id === productLocalStorage[i].id && productLocalStorage[i].color === colorChosen) {
                     oldQuantity = productLocalStorage[i].quantity;
                 }
@@ -129,8 +123,6 @@ document.addEventListener("DOMContentLoaded", function (event) {
             // La fonction parseInt() analyse une chaîne de caractère fournie en argument et renvoie un entier exprimé dans une base donnée
             quantityChosen = parseInt(oldQuantity) + parseInt(quantity);
 
-            // on définit le produit choisi en créant une nouvelle instance de ProductClass,
-            // en programmation orientée classe, l'instanciation est la création d'un objet à partir d'une classe
             // on injecte les nouvelles valeurs dans la Class.
             let productChosen = new ProductClass(
                 product._id,
