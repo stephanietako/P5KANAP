@@ -3,7 +3,8 @@ document.addEventListener("DOMContentLoaded", function () {
     //-------------------fonction principale-------------------//
     //--------------------------------------------------------//
     async function main() {
-
+        // fonction asynchrone
+        // Le mot-clé await fait en sorte que JavaScript attende que cette promesse se réalise et renvoie son résultat
         let products = await getProducts();
 
         for (let product of products) {

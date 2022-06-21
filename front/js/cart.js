@@ -4,24 +4,24 @@ document.addEventListener("DOMContentLoaded", function () {
     //--------------------------------------------------------//
     async function main() {
 
-        let ApiArray = [];
+        let apiArray = [];
 
         // on stocke les informations sur le localstorage
         let localStorageArray = getLocalStorageProduct();
 
         for (let i = 0; i < localStorageArray.length; i++) {
-            ApiArray.push(await GetApi(localStorageArray[i]));
+            apiArray.push(await getApi(localStorageArray[i]));
         }
 
-        let AllProducts = ConcatArray(localStorageArray, ApiArray);
+        let allProducts = concatArray(localStorageArray, apiArray);
 
-        DisplayProduct(AllProducts);
+        displayProduct(allProducts);
 
-        DisplayTotalPrice(AllProducts);
+        displayTotalPrice(allProducts);
 
-        Listen(AllProducts);
+        listen(allProducts);
 
-        ValidationForm();
+        validationForm();
 
 
     }
@@ -32,7 +32,6 @@ document.addEventListener("DOMContentLoaded", function () {
     //-------------------------------------------------------------------------//
     function getLocalStorageProduct() {
 
-        //déclaration de variable
         let getLocalStorage = [];
         for (let i = 0; i < localStorage.length; i++) {
             getLocalStorage[i] = JSON.parse(localStorage.getItem(localStorage.key(i)));
@@ -44,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     //------------------------Récupération de l'API -----------------------//
     //--------------------------------------------------------------------//
-    function GetApi(localStorageArray) {
+    function getApi(localStorageArray) {
         console.log(localStorageArray)
         return fetch("http://localhost:3000/api/products/" + localStorageArray.id)
             .then(function (response) {
@@ -73,39 +72,39 @@ document.addEventListener("DOMContentLoaded", function () {
 
     //----------------Concaténer localStorage et api -----------------------//
     //----------------------------------------------------------------------//
-    function ConcatArray(localStorageArray, ApiArray) {
+    function concatArray(localStorageArray, apiArray) {
 
-        let AllProducts = [];
+        let allProducts = [];
 
         for (let i = 0; i < localStorageArray.length; i++) {
 
-            let ObjectProduct = new ProductClass(
+            let objectProduct = new ProductClass(
                 localStorageArray[i].id,
-                ApiArray[i].name,
+                apiArray[i].name,
                 localStorageArray[i].color,
                 localStorageArray[i].quantity,
-                ApiArray[i].altTxt,
-                ApiArray[i].description,
-                ApiArray[i].imageUrl,
-                ApiArray[i].price,
+                apiArray[i].altTxt,
+                apiArray[i].description,
+                apiArray[i].imageUrl,
+                apiArray[i].price,
             );
 
-            AllProducts.push(ObjectProduct);
+            allProducts.push(objectProduct);
 
         }
 
-        return AllProducts;
+        return allProducts;
 
     }
 
     //-------------------Fonction d'affichage des produits-------------------//
     //-----------------------------------------------------------------------//
-    function DisplayProduct(AllProducts) {
+    function displayProduct(allProducts) {
 
-        for (product of AllProducts) {
+        for (product of allProducts) {
             // on stocke la balise Html.
             const domCreation = document.getElementById("cart__items");
-            // on push nos nouvels informations dans notre Html
+            // on push nos nouvelles informations dans notre Html
             domCreation.insertAdjacentHTML(
                 "beforeend",
                 `<article class="cart__item" data-id="${product.id}" data-color="${product.color}">
@@ -136,47 +135,46 @@ document.addEventListener("DOMContentLoaded", function () {
 
     //-------------------Fonction affichage prix total-------------------//
     //------------------------------------------------------------------//
-    function DisplayTotalPrice(AllProducts) {
+    function displayTotalPrice(allProducts) {
 
-        // de base 2 variable a 0
         let totalPrice = 0;
         let totalQty = 0;
 
-        for (product of AllProducts) {
+        for (product of allProducts) {
             totalPrice += parseInt(product.qty * product.price);
             totalQty += parseInt(product.qty);
         }
 
-        const DtotalQty = document.getElementById("totalQuantity");
-        const DtotalPrice = document.getElementById("totalPrice");
+        const displayTotalQty = document.getElementById("totalQuantity");
+        const displayTotalPrice = document.getElementById("totalPrice");
 
-        DtotalQty.innerText = totalQty;
-        DtotalPrice.innerText = totalPrice;
+        displayTotalQty.innerText = totalQty;
+        displayTotalPrice.innerText = totalPrice;
     }
 
     //-------------------Fonction principal d'écoute-------------------//
     //----------------------------------------------------------------//
-    function Listen(AllProducts) {
-        // fonction si changement dans notre input quantity.
-        ecoutequantity(AllProducts);
-        // fonction si on veux supprimer un éléments de la liste.
-        //ecoutedeleteProduct(AllProducts);
-        ecoutedeleteProduct(AllProducts);
+    function listen(allProducts) {
+        // fonction si changement dans notre input de quantité
+        listenQty(allProducts);
+        // fonction si on veux supprimer un éléments de la liste
+        listenDeleteProduct(allProducts);
 
     }
 
     //-------------------Fonction d'écoute de quantité-------------------//
     //-------------------------------------------------------------------//
-    function ecoutequantity(AllProducts) {
+    function listenQty(allProducts) {
         let qtyinput = document.querySelectorAll(".itemQuantity");
 
         qtyinput.forEach(function (input) {
+            // évenement change est déclanché pour l'événement input 
             input.addEventListener("change", function (inputevent) {
 
                 let inputQty = inputevent.target.value;
 
                 if (inputQty >= 1 && inputQty <= 100) {
-                    const Name = input
+                    const name = input
                         .closest("div.cart__item__content")
                         .querySelector("div.cart__item__content__description > h2").innerText;
 
@@ -184,18 +182,18 @@ document.addEventListener("DOMContentLoaded", function () {
                         .closest("div.cart__item__content")
                         .querySelector("div.cart__item__content__description > p").innerText;
 
-                    const productName = Name + " " + color;
+                    const addProductsQty = name + " " + color;
 
-                    let localstorageKey = JSON.parse(localStorage.getItem(productName));
-                    //console.log(inputQty);
+                    let localstorageKey = JSON.parse(localStorage.getItem(addProductsQty));
+
                     localstorageKey.qty = parseInt(inputQty);
-                    localStorage.setItem(productName, JSON.stringify(localstorageKey));
+                    localStorage.setItem(addProductsQty, JSON.stringify(localstorageKey));
 
-                    const result = AllProducts.find(AllProduct => AllProduct.name === localstorageKey.name && AllProduct.color === localstorageKey.color);
+                    const result = allProducts.find(allProduct => allProduct.name === localstorageKey.name && allProduct.color === localstorageKey.color);
                     console.log(result)
                     result.qty = inputQty;
 
-                    DisplayTotalPrice(AllProducts);
+                    displayTotalPrice(allProducts);
 
                 } else {
                     alert("Veuillez choisir une quantité valable.")
@@ -207,15 +205,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     //-------------------Fonction supprimer quantité-------------------//
     //-------------------------------------------------------------------//
-    // là je déclare ma fonction ecoutedeleteProduct
-
-    function ecoutedeleteProduct(AllProducts) {
+    function listenDeleteProduct(allProducts) {
 
         const allDeleteBtn = document.querySelectorAll('.deleteItem');
         allDeleteBtn.forEach(input => {
             input.addEventListener("click", function () {
 
-                const Name = input
+                const name = input
                     .closest("div.cart__item__content")
                     .querySelector("div.cart__item__content__description > h2").innerText;
 
@@ -223,67 +219,57 @@ document.addEventListener("DOMContentLoaded", function () {
                     .closest("div.cart__item__content")
                     .querySelector("div.cart__item__content__description > p").innerText;
 
-                const productName = Name + " " + color;
-                console.log(productName)
-                let localstorageKey = JSON.parse(localStorage.getItem(productName));
+                const addProducts = name + " " + color;
+                console.log(addProducts)
+                let localstorageKey = JSON.parse(localStorage.getItem(addProducts));
 
-                localStorage.removeItem(productName);
+                localStorage.removeItem(addProducts);
 
                 input.closest("article.cart__item").remove();
 
-                const result = AllProducts.find(AllProduct => AllProduct.name === localstorageKey.name && AllProduct.color === localstorageKey.color);
+                const result = allProducts.find(allProduct => allProduct.name === localstorageKey.name && allProduct.color === localstorageKey.color);
                 console.log(result)
-                AllProducts = AllProducts.filter(product => product !== result);
+                allProducts = allProducts.filter(product => product !== result);
 
-                ecoutequantity(AllProducts);
+                listenQty(allProducts);
 
-                DisplayTotalPrice(AllProducts);
+                displayTotalPrice(allProducts);
             })
         })
     }
 
 
-    //----------------------------------------
-    function ValidationRegex(form) {
+    //---------------- Regexp les expréssions régulières
+    function validationRegexp(form) {
         // Initialisation de nos variables de test.
-        const stringRegex = /^[a-zA-Z-]+$/;
-        const emailRegex = /^\w+([.-]?\w+)@\w+([.-]?\w+).(.\w{2,3})+$/;
-        const addressRegex = /^[a-zA-Z0-9\s,.'-]{3,}$/;
-        const cityRegex = /^[a-zA-Z',.\s-]{1,25}$/;
+        const stringRegexp = /^[a-zA-Z-]+$/;
+        const emailRegexp = /^\w+([.-]?\w+)@\w+([.-]?\w+).(.\w{2,3})+$/;
+        const addressRegexp = /^[a-zA-Z0-9\s,.'-]{3,}$/;
+        const cityRegexp = /^[a-zA-Z',.\s-]{1,25}$/;
         let control = true;
 
-        // si une des valeurs dans nos inputs de notre Form est invalide on affiche un méssage d'érreur
+        // si une des valeurs dans nos inputs de notre Form est invalide on affiche un message d'erreur
 
         // firstName
-        if (!form.firstName.value.match(stringRegex)) {
-            document.getElementById("firstNameErrorMsg").innerText = "Mauvais prénom";
+        // match() renvoie un tableau contenant toutes les correspondances ou null si aucun n'est trouvé
+        if (!form.firstName.value.match(stringRegexp)) {
+            document.getElementById("firstNameErrorMsg").innerText = "Prénom invalide";
             control = false;
-            // Sinon on affiche rien
         } else {
             document.getElementById("firstNameErrorMsg").innerText = "";
         }
 
         // lastName
-        if (!form.lastName.value.match(stringRegex)) {
-            document.getElementById("lastNameErrorMsg").innerText = "Mauvais nom";
+        if (!form.lastName.value.match(stringRegexp)) {
+            document.getElementById("lastNameErrorMsg").innerText = "Nom invalide";
             control = false;
-            // Sinon on affiche rien
         } else {
             document.getElementById("lastNameErrorMsg").innerText = "";
         }
 
-        // email
-        if (!form.email.value.match(emailRegex)) {
-            document.getElementById("emailErrorMsg").innerText = "Mauvais email";
-            control = false;
-            // Sinon on affiche rien
-        } else {
-            document.getElementById("emailErrorMsg").innerText = "";
-        }
-
         // address
-        if (!form.address.value.match(addressRegex)) {
-            document.getElementById("addressErrorMsg").innerText = "Mauvaise adresse";
+        if (!form.address.value.match(addressRegexp)) {
+            document.getElementById("addressErrorMsg").innerText = "adresse invalide";
             control = false;
             // Sinon on affiche rien
         } else {
@@ -292,12 +278,20 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         // city
-        if (!form.city.value.match(cityRegex)) {
-            document.getElementById("cityErrorMsg").innerText = "Mauvaise ville";
+        if (!form.city.value.match(cityRegexp)) {
+            document.getElementById("cityErrorMsg").innerText = "ville invalide";
             control = false;
             // Sinon on affiche rien
         } else {
             document.getElementById("cityErrorMsg").innerText = "";
+        }
+
+        // email
+        if (!form.email.value.match(emailRegexp)) {
+            document.getElementById("emailErrorMsg").innerText = "email invalide";
+            control = false;
+        } else {
+            document.getElementById("emailErrorMsg").innerText = "";
         }
 
         if (control) {
@@ -308,7 +302,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    function ValidationForm() {
+    function validationForm() {
 
         let btnOrder = document.getElementById("order");
 
@@ -318,8 +312,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (localStorage.length !== 0) {
 
-                if (ValidationRegex(form)) {
-                    console.log("Le formulaire est BIEN remplis")
+                if (validationRegexp(form)) {
+                    console.log("Le formulaire est correctement rempli")
 
                     let contact = {
                         firstName: form.firstName.value,
@@ -329,7 +323,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         email: form.email.value,
                     }
 
-                    // array localStorage
+                    // localStorage
                     let getLocalStorage = [];
                     for (let i = 0; i < localStorage.length; i++) {
                         getLocalStorage[i] = JSON.parse(localStorage.getItem(localStorage.key(i))).id;
@@ -340,9 +334,10 @@ document.addEventListener("DOMContentLoaded", function () {
                         contact: contact,
                         products: getLocalStorage,
                     };
-
+                    // POST
                     const options = {
                         method: "POST",
+                        // La méthode JSON.stringify() convertit une valeur JavaScript en chaîne JSON
                         body: JSON.stringify(order),
                         headers: {
                             Accept: "application/json",
@@ -353,7 +348,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     fetch("http://localhost:3000/api/products/order/", options)
                         .then((response) => response.json())
                         .then(function (data) {
-                            // c est transmettre un paramètre d URL
+                            //le point d'interogation sépare l'adresse url et la déstination
                             window.location.href = "confirmation.html?id=" + data.orderId;
                         })
                         .catch(function (error) {
@@ -362,7 +357,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 } else {
                     event.preventDefault();
-                    alert("Le formulaire est MAL remplis");
+                    alert("Le formulaireest incomplet ou invalide");
                 }
 
             } else {
